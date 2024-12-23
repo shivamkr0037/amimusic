@@ -373,4 +373,40 @@ class YouTubeAPI:
             direct = True
             downloaded_file = await loop.run_in_executor(None, audio_dl)
         return downloaded_file, direct
-    
+
+import random
+import requests
+import asyncio
+
+HUGGING_TOKEN = os.getenv("HF2")
+
+async def hfv(api_url, timeout=10):
+    try:
+        headers = {
+            "Authorization": f"Bearer {HUGGING_TOKEN}",
+            "Content-Type": "application/json",
+        }
+        response = await async_searcher(api_url, headers=headers, re_json=True)
+        stat = response.get("message", "ded")
+        return stat
+    except requests.exceptions.RequestException as e:
+        print("Error occurred:", e)
+        return False
+
+async def periodic_hfv(api_url, interval_range):
+    while True:
+        result = await hfv(api_url)
+        print(result)
+        interval = random.randint(*interval_range)
+        await asyncio.sleep(interval)
+
+async def start_periodic_task():
+    interval_range = (2 * 3600, 4 * 3600)  # Call the function every 2 to 4 hours
+    api_url = "https://shivam413-spaces.hf.space/status"
+    asyncio.create_task(periodic_hfv(api_url, interval_range))
+
+
+async def extract_user(message: Message, args: List[str]) -> Optional[int]:
+    prev_message = await message.get_reply_message()
+    return prev_message.sender_id if prev_message else None
+
