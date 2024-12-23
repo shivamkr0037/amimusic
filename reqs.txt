@@ -1,0 +1,7 @@
+fastapi[all]
+uvicorn[standard]
+GitPython
+gpytranslate
+pydantic
+python-dotenv
+nest_asyncio
